@@ -1,0 +1,45 @@
+version: '3'
+
+networks:
+  symfony.study_network:
+
+services:
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    container_name: ${APP_NAME}-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    volumes:
+      - ${DATABASE_VOLUME}
+    networks:
+      - ${NETWORK_NAME}
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${APP_NAME}-app
+    environment:
+      - APP_ENV=${APP_ENV}
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - database
+    networks:
+      - ${NETWORK_NAME}
+
+  nginx:
+    image: nginx:alpine
+    container_name: ${APP_NAME}-nginx
+    ports:
+      - "${NGINX_HOST_PORT}:80"
+    volumes:
+      - ${NGINX_VOLUME}
+    depends_on:
+      - app
+    networks:
+      - ${NETWORK_NAME}
+
+volumes:
+  database_data:
