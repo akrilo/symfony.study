@@ -1,0 +1,1272 @@
+openapi: '3.0.0'
+info:
+  title: "symfony.study API"
+  version: "1.0.0"
+tags:
+  - name: "Product"
+  - name: "User"
+  - name: "Favorite"
+  - name: "Article"
+paths:
+  /products:
+    get:
+      summary: "Получить список товаров с пагинацией"
+      tags:
+        - "Product"
+      parameters:
+        - in: query
+          name: "page"
+          schema:
+            type: integer
+          example: 1
+          description: "Номер страницы"
+        - in: query
+          name: "page_size"
+          schema:
+            type: integer
+          example: 10
+          description: "Размер страницы"
+        - in: query
+          name: "sort_by"
+          schema:
+            type: string
+            enum: ["name", "price"]
+          example: "name"
+          description: "Поле для сортировки"
+        - in: query
+          name: "sort_order"
+          schema:
+            type: string
+            enum: ["asc", "desc"]
+          example: "asc"
+          description: "Порядок сортировки"
+      responses:
+        '200':
+          description: "Список товаров с пагинацией"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+              example:
+                pagination:
+                  current_page: 1
+                  pages: 5
+                  page_size: 10
+                list:
+                  - uuid: "123e4567-e89b-12d3-a456-426614174000"
+                    name: "Продукт A"
+                    code: "product-a"
+                    description: "Описание продукта A"
+                    preview_image: "/images/product-a.jpg"
+                    price: "1000"
+                    category:
+                      uuid: "c123e4567-e89b-12d3-a456-426614174000"
+                      name: "Категория A"
+                    gallery:
+                      - uuid: "g123e4567-e89b-12d3-a456-426614174000"
+                        name: "Изображение 1"
+                        url: "/images/gallery1.jpg"
+                    files:
+                      - uuid: "f123e4567-e89b-12d3-a456-426614174000"
+                        name: "Инструкция"
+                        url: "/files/instruction.pdf"
+                    articles:
+                      - uuid: "a123e4567-e89b-12d3-a456-426614174000"
+                        name: "Статья A"
+                        code: "article-a"
+                        text: "Текст статьи A"
+                        user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                        created_at: "2023-05-03T11:30:00Z"
+                        updated_at: "2023-05-03T12:00:00Z"
+                    is_favorite: true
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              example:
+                error_code: 400
+                message: "Некорректный запрос"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: "Создать новый товар"
+      tags:
+        - "Product"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              name: "Продукт B"
+              code: "product-b"
+              description: "Описание продукта B"
+              preview_image: "/images/product-b.jpg"
+              price: "1500"
+              category_uuid: "c123e4567-e89b-12d3-a456-426614174000"
+              gallery:
+                - uuid: "g223e4567-e89b-12d3-a456-426614174001"
+                  name: "Изображение 2"
+                  url: "/images/gallery2.jpg"
+              files:
+                - uuid: "f223e4567-e89b-12d3-a456-426614174001"
+                  name: "Дополнительный файл"
+                  url: "/files/additional.pdf"
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: "Товар создан"
+          content:
+            application/json:
+              example:
+                uuid: "123e4567-e89b-12d3-a456-426614174001"
+                name: "Продукт B"
+                code: "product-b"
+                description: "Описание продукта B"
+                preview_image: "/images/product-b.jpg"
+                price: "1500"
+                category:
+                  uuid: "c123e4567-e89b-12d3-a456-426614174000"
+                  name: "Категория A"
+                gallery:
+                  - uuid: "g223e4567-e89b-12d3-a456-426614174001"
+                    name: "Изображение 2"
+                    url: "/images/gallery2.jpg"
+                files:
+                  - uuid: "f223e4567-e89b-12d3-a456-426614174001"
+                    name: "Дополнительный файл"
+                    url: "/files/additional.pdf"
+                is_favorite: false
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 400
+                message: "Ошибка при создании товара"
+
+  /products/{product_uuid}:
+    get:
+      summary: "Получить информацию о конкретном товаре по UUID"
+      tags:
+        - "Product"
+      parameters:
+        - in: path
+          name: "product_uuid"
+          required: true
+          schema:
+            type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID товара"
+      responses:
+        '200':
+          description: "Информация о товаре"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              example:
+                uuid: "123e4567-e89b-12d3-a456-426614174000"
+                name: "Продукт A"
+                code: "product-a"
+                description: "Описание продукта A"
+                preview_image: "/images/product-a.jpg"
+                price: "1000"
+                category:
+                  uuid: "c123e4567-e89b-12d3-a456-426614174000"
+                  name: "Категория A"
+                gallery:
+                  - uuid: "g123e4567-e89b-12d3-a456-426614174000"
+                    name: "Изображение 1"
+                    url: "/images/gallery1.jpg"
+                files:
+                  - uuid: "f123e4567-e89b-12d3-a456-426614174000"
+                    name: "Инструкция"
+                    url: "/files/instruction.pdf"
+                articles:
+                  - uuid: "a123e4567-e89b-12d3-a456-426614174000"
+                    name: "Статья A"
+                    code: "article-a"
+                    text: "Текст статьи A"
+                    user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                    created_at: "2023-05-03T11:30:00Z"
+                    updated_at: "2023-05-03T12:00:00Z"
+                is_favorite: true
+        '404':
+          description: "Товар не найден"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 404
+                message: "Товар не найден"
+
+    delete:
+      summary: "Удалить товар"
+      tags:
+        - "Product"
+      parameters:
+        - in: path
+          name: "product_uuid"
+          required: true
+          schema:
+            type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID товара"
+      responses:
+        '200':
+          description: "Товар удален"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+        '404':
+          description: "Товар не найден"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 404
+                message: "Товар не найден"
+
+  /users:
+    post:
+      summary: "Добавить нового пользователя"
+      tags:
+        - "User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              phone: "+79998887766"
+              password: "password123"
+              email: "user@example.com"
+              surname: "Иванов"
+              name: "Иван"
+              patronymic: "Иванович"
+              avatar: "/avatars/ivanov.jpg"
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: "Пользователь создан"
+          content:
+            application/json:
+              example:
+                uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                phone: "+79998887766"
+                email: "user@example.com"
+                surname: "Иванов"
+                name: "Иван"
+                patronymic: "Иванович"
+                avatar: "/avatars/ivanov.jpg"
+                created_at: "2023-05-03T12:00:00Z"
+                updated_at: "2023-05-03T12:00:00Z"
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              example:
+                error_code: 400
+                message: "Ошибка при создании пользователя"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{user_uuid}:
+    get:
+      summary: "Получить информацию о пользователе по UUID"
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: "user_uuid"
+          required: true
+          schema:
+            type: string
+          example: "u123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID пользователя"
+      responses:
+        '200':
+          description: "Информация о пользователе"
+          content:
+            application/json:
+              example:
+                uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                phone: "+79998887766"
+                email: "user@example.com"
+                surname: "Иванов"
+                name: "Иван"
+                patronymic: "Иванович"
+                avatar: "/avatars/ivanov.jpg"
+                created_at: "2023-05-03T12:00:00Z"
+                updated_at: "2023-05-03T12:00:00Z"
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: "Пользователь не найден"
+          content:
+            application/json:
+              example:
+                error_code: 404
+                message: "Пользователь не найден"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: "Редактировать информацию о пользователе"
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: "user_uuid"
+          required: true
+          schema:
+            type: string
+          example: "u123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID пользователя"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              phone: "+79998887766"
+              email: "user_new@example.com"
+              surname: "Иванов"
+              name: "Иван"
+              patronymic: "Иванович"
+              avatar: "/avatars/ivanov_new.jpg"
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: "Информация о пользователе обновлена"
+          content:
+            application/json:
+              example:
+                uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                phone: "+79998887766"
+                email: "user_new@example.com"
+                surname: "Иванов"
+                name: "Иван"
+                patronymic: "Иванович"
+                avatar: "/avatars/ivanov_new.jpg"
+                created_at: "2023-05-03T12:00:00Z"
+                updated_at: "2023-05-03T14:00:00Z"
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              example:
+                error_code: 400
+                message: "Ошибка при обновлении пользователя"
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: "Пользователь не найден"
+          content:
+            application/json:
+              example:
+                error_code: 404
+                message: "Пользователь не найден"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: "Удалить пользователя"
+      tags:
+        - "User"
+      parameters:
+        - in: path
+          name: "user_uuid"
+          required: true
+          schema:
+            type: string
+          example: "u123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID пользователя"
+      responses:
+        '200':
+          description: "Пользователь удален"
+          content:
+            application/json:
+              example:
+                success: true
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          description: "Пользователь не найден"
+          content:
+            application/json:
+              example:
+                error_code: 404
+                message: "Пользователь не найден"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /favorites:
+    get:
+      summary: "Получить список избранного"
+      tags:
+        - "Favorite"
+      parameters:
+        - in: query
+          name: "user_uuid"
+          required: true
+          schema:
+            type: string
+          example: "u123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID пользователя"
+      responses:
+        '200':
+          description: "Список избранного"
+          content:
+            application/json:
+              example:
+                list:
+                  - uuid: "f123e4567-e89b-12d3-a456-426614174000"
+                    product:
+                      uuid: "123e4567-e89b-12d3-a456-426614174000"
+                      name: "Продукт A"
+                      preview_image: "/images/product-a.jpg"
+                    user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+              schema:
+                $ref: '#/components/schemas/FavoriteList'
+        '404':
+          description: "Избранное не найдено"
+          content:
+            application/json:
+              example:
+                error_code: 404
+                message: "Избранное не найдено"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: "Добавить товар в избранное"
+      tags:
+        - "Favorite"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+              product_uuid: "123e4567-e89b-12d3-a456-426614174000"
+            schema:
+              $ref: '#/components/schemas/FavoriteRequest'
+      responses:
+        '201':
+          description: "Товар добавлен в избранное"
+          content:
+            application/json:
+              example:
+                success: true
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              example:
+                error_code: 400
+                message: "Ошибка при добавлении товара в избранное"
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: "Товар или пользователь не найден"
+          content:
+            application/json:
+              example:
+                error_code: 404
+                message: "Товар или пользователь не найден"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: "Удалить товар из избранного"
+      tags:
+        - "Favorite"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+              product_uuid: "123e4567-e89b-12d3-a456-426614174000"
+            schema:
+              $ref: '#/components/schemas/FavoriteRequest'
+      responses:
+        '200':
+          description: "Товар удален из избранного"
+          content:
+            application/json:
+              example:
+                success: true
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              example:
+                error_code: 400
+                message: "Ошибка при удалении товара из избранного"
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: "Товар или пользователь не найден"
+          content:
+            application/json:
+              example:
+                error_code: 404
+                message: "Товар или пользователь не найден"
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /articles:
+    get:
+      summary: "Получить список статей"
+      tags:
+        - "Article"
+      responses:
+        '200':
+          description: "Список статей"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleList'
+              example:
+                list:
+                  - uuid: "a123e4567-e89b-12d3-a456-426614174000"
+                    name: "Статья A"
+                    code: "article-a"
+                    text: "Текст статьи A"
+                    user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                    created_at: "2023-05-03T11:30:00Z"
+                    updated_at: "2023-05-03T12:00:00Z"
+                    products:
+                      - uuid: "123e4567-e89b-12d3-a456-426614174000"
+                        name: "Продукт A"
+                        preview_image: "/images/product-a.jpg"
+                      - uuid: "223e4567-e89b-12d3-a456-426614174001"
+                        name: "Продукт B"
+                        preview_image: "/images/product-b.jpg"
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 400
+                message: "Некорректный запрос"
+
+    post:
+      summary: "Создать новую статью"
+      tags:
+        - "Article"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              name: "Статья B"
+              code: "article-b"
+              text: "Текст статьи B"
+              user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+              product_uuids:
+                - "123e4567-e89b-12d3-a456-426614174000"
+                - "123e4567-e89b-12d3-a456-426614174001"
+            schema:
+              $ref: '#/components/schemas/ArticleRequest'
+      responses:
+        '201':
+          description: "Статья создана"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+              example:
+                uuid: "a223e4567-e89b-12d3-a456-426614174001"
+                name: "Статья B"
+                code: "article-b"
+                text: "Текст статьи B"
+                user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                created_at: "2023-05-03T12:15:00Z"
+                updated_at: "2023-05-03T12:15:00Z"
+                products:
+                  - uuid: "123e4567-e89b-12d3-a456-426614174000"
+                    name: "Продукт A"
+                    preview_image: "/images/product-a.jpg"
+                  - uuid: "123e4567-e89b-12d3-a456-426614174001"
+                    name: "Продукт B"
+                    preview_image: "/images/product-b.jpg"
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 400
+                message: "Ошибка при создании статьи"
+
+  /articles/{article_uuid}:
+    get:
+      summary: "Получить информацию о статье по UUID"
+      tags:
+        - "Article"
+      parameters:
+        - in: path
+          name: "article_uuid"
+          required: true
+          schema:
+            type: string
+          example: "a123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID статьи"
+      responses:
+        '200':
+          description: "Информация о статье"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+              example:
+                uuid: "a123e4567-e89b-12d3-a456-426614174000"
+                name: "Статья A"
+                code: "article-a"
+                text: "Текст статьи A"
+                user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+                created_at: "2023-05-03T11:30:00Z"
+                updated_at: "2023-05-03T12:00:00Z"
+                products:
+                  - uuid: "123e4567-e89b-12d3-a456-426614174000"
+                    name: "Продукт A"
+                    preview_image: "/images/product-a.jpg"
+        '404':
+          description: "Статья не найдена"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 404
+                message: "Статья не найдена"
+
+    patch:
+      summary: "Редактировать информацию о статье"
+      tags:
+        - "Article"
+      parameters:
+        - in: path
+          name: "article_uuid"
+          required: true
+          schema:
+            type: string
+          example: "a123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID статьи"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              name: "Статья A обновленная"
+              code: "article-a-updated"
+              text: "Текст статьи A обновленный"
+              product_uuids:
+                - "123e4567-e89b-12d3-a456-426614174000"
+            schema:
+              $ref: '#/components/schemas/ArticleRequest'
+      responses:
+        '200':
+          description: "Статья обновлена"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+              example:
+                uuid: "a123e4567-e89b-12d3-a456-426614174000"
+                name: "Статья A обновленная"
+                code: "article-a-updated"
+                text: "Текст статьи A обновленный"
+                products:
+                  - uuid: "123e4567-e89b-12d3-a456-426614174000"
+                    name: "Продукт A"
+                    preview_image: "/images/product-a.jpg"
+        '400':
+          description: "Неверный запрос"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 400
+                message: "Ошибка при обновлении статьи"
+        '404':
+          description: "Статья не найдена"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 404
+                message: "Статья не найдена"
+
+    delete:
+      summary: "Удалить статью"
+      tags:
+        - "Article"
+      parameters:
+        - in: path
+          name: "article_uuid"
+          required: true
+          schema:
+            type: string
+          example: "a123e4567-e89b-12d3-a456-426614174000"
+          description: "UUID статьи"
+      responses:
+        '200':
+          description: "Статья удалена"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+        '404':
+          description: "Статья не найдена"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: 404
+                message: "Статья не найдена"
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: "UUID"
+        name:
+          type: string
+          description: "Имя"
+        code:
+          type: string
+          description: "Код"
+        description:
+          type: string
+          description: "Описание"
+        preview_image:
+          type: string
+          description: "Превью изображения"
+        price:
+          type: string
+          description: "Цена"
+        category:
+          type: object
+          properties:
+            uuid:
+              type: string
+              description: "UUID категории"
+            name:
+              type: string
+              description: "Имя категории"
+        gallery:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID изображения"
+              name:
+                type: string
+                description: "Имя изображения"
+              url:
+                type: string
+                description: "URL изображения"
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID файла"
+              name:
+                type: string
+                description: "Имя файла"
+              url:
+                type: string
+                description: "URL файла"
+              type:
+                type: string
+                description: "Тип файла"
+              size:
+                type: integer
+                description: "Размер файла"
+        articles:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID статьи"
+              name:
+                type: string
+                description: "Имя статьи"
+              code:
+                type: string
+                description: "Код статьи"
+        is_favorite:
+          type: boolean
+          description: "Находится ли товар в избранном"
+      example:
+        uuid: "123e4567-e89b-12d3-a456-426614174000"
+        name: "Продукт A"
+        code: "product-a"
+        description: "Описание продукта A"
+        preview_image: "/images/product-a.jpg"
+        price: "1000"
+        category:
+          uuid: "c123e4567-e89b-12d3-a456-426614174000"
+          name: "Категория A"
+        gallery:
+          - uuid: "g123e4567-e89b-12d3-a456-426614174000"
+            name: "Изображение 1"
+            url: "/images/gallery1.jpg"
+        files:
+          - uuid: "f123e4567-e89b-12d3-a456-426614174000"
+            name: "Инструкция"
+            url: "/files/instruction.pdf"
+            type: "PDF"
+            size: 1024
+        articles:
+          - uuid: "a123e4567-e89b-12d3-a456-426614174000"
+            name: "Статья A"
+            code: "article-a"
+            text: "Текст статьи A"
+            user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+        is_favorite: true
+
+    ProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Имя"
+        code:
+          type: string
+          description: "Код"
+        description:
+          type: string
+          description: "Описание"
+        preview_image:
+          type: string
+          description: "Превью"
+        price:
+          type: string
+          description: "Цена"
+        category_uuid:
+          type: string
+          description: "UUID категории"
+        gallery:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID изображения"
+              name:
+                type: string
+                description: "Имя изображения"
+              url:
+                type: string
+                description: "URL изображения"
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID файла"
+              name:
+                type: string
+                description: "Имя файла"
+              url:
+                type: string
+                description: "URL файла"
+              type:
+                type: string
+                description: "Тип файла"
+              size:
+                type: integer
+                description: "Размер файла"
+      example:
+        name: "Продукт B"
+        code: "product-b"
+        description: "Описание продукта B"
+        preview_image: "/images/product-b.jpg"
+        price: "1500"
+        category_uuid: "c123e4567-e89b-12d3-a456-426614174000"
+        gallery:
+          - uuid: "g223e4567-e89b-12d3-a456-426614174001"
+            name: "Изображение 2"
+            url: "/images/gallery2.jpg"
+        files:
+          - uuid: "f223e4567-e89b-12d3-a456-426614174001"
+            name: "Дополнительный файл"
+            url: "/files/additional.pdf"
+            type: "PDF"
+            size: 2048
+
+    ProductList:
+      type: object
+      properties:
+        pagination:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              description: "Текущая страница"
+            pages:
+              type: integer
+              description: "Количество страниц"
+            page_size:
+              type: integer
+              description: "Размер страницы"
+          example:
+            current_page: 1
+            pages: 5
+            page_size: 10
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+      example:
+        pagination:
+          current_page: 1
+          pages: 5
+          page_size: 10
+        list:
+          - uuid: "123e4567-e89b-12d3-a456-426614174000"
+            name: "Продукт A"
+            code: "product-a"
+            description: "Описание продукта A"
+            preview_image: "/images/product-a.jpg"
+            price: "1000"
+            category:
+              uuid: "c123e4567-e89b-12d3-a456-426614174000"
+              name: "Категория A"
+
+    UserRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          description: "Телефон"
+        password:
+          type: string
+          description: "Пароль"
+        email:
+          type: string
+          description: "Email"
+        surname:
+          type: string
+          description: "Фамилия"
+        name:
+          type: string
+          description: "Имя"
+        patronymic:
+          type: string
+          description: "Отчество"
+        avatar:
+          type: string
+          description: "URL аватара"
+      example:
+        phone: "+79998887766"
+        password: "password123"
+        email: "user@example.com"
+        surname: "Иванов"
+        name: "Иван"
+        patronymic: "Иванович"
+        avatar: "/avatars/ivanov.jpg"
+
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: "UUID"
+        phone:
+          type: string
+          description: "Телефон"
+        email:
+          type: string
+          description: "Email"
+        surname:
+          type: string
+          description: "Фамилия"
+        name:
+          type: string
+          description: "Имя"
+        patronymic:
+          type: string
+          description: "Отчество"
+        avatar:
+          type: string
+          description: "URL аватара"
+        created_at:
+          type: string
+          format: date-time
+          description: "Дата создания"
+        updated_at:
+          type: string
+          format: date-time
+          description: "Дата обновления"
+      example:
+        uuid: "u123e4567-e89b-12d3-a456-426614174000"
+        phone: "+79998887766"
+        email: "user@example.com"
+        surname: "Иванов"
+        name: "Иван"
+        patronymic: "Иванович"
+        avatar: "/avatars/ivanov.jpg"
+        created_at: "2023-05-03T12:00:00Z"
+        updated_at: "2023-05-03T12:00:00Z"
+
+    FavoriteRequest:
+      type: object
+      properties:
+        user_uuid:
+          type: string
+          description: "UUID пользователя"
+        product_uuid:
+          type: string
+          description: "UUID товара"
+      example:
+        user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+        product_uuid: "123e4567-e89b-12d3-a456-426614174000"
+
+    FavoriteList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID избранного"
+              product_uuid:
+                type: string
+                description: "UUID товара"
+              product:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    description: "UUID товара"
+                  name:
+                    type: string
+                    description: "Имя товара"
+                  preview_image:
+                    type: string
+                    description: "Превью изображения"
+              user_uuid:
+                type: string
+                description: "UUID пользователя"
+      example:
+        uuid: "f123e4567-e89b-12d3-a456-426614174000"
+        product_uuid: "123e4567-e89b-12d3-a456-426614174000"
+        product:
+          uuid: "123e4567-e89b-12d3-a456-426614174000"
+          name: "Продукт A"
+          preview_image: "/images/product-a.jpg"
+        user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+
+    ArticleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Имя статьи"
+        code:
+          type: string
+          description: "Код статьи"
+        text:
+          type: string
+          description: "Текст статьи"
+        user_uuid:
+          type: string
+          description: "UUID пользователя"
+        product_uuids:
+          type: array
+          items:
+            type: string
+            description: "UUID товара"
+      example:
+        name: "Статья B"
+        code: "article-b"
+        text: "Текст статьи B"
+        user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+        product_uuids:
+          - "123e4567-e89b-12d3-a456-426614174000"
+          - "123e4567-e89b-12d3-a456-426614174001"
+
+    Article:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: "UUID"
+        name:
+          type: string
+          description: "Имя"
+        code:
+          type: string
+          description: "Код"
+        text:
+          type: string
+          description: "Текст"
+        user_uuid:
+          type: string
+          description: "UUID пользователя"
+        created_at:
+          type: string
+          format: date-time
+          description: "Дата создания"
+        updated_at:
+          type: string
+          format: date-time
+          description: "Дата обновления"
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID товара"
+              name:
+                type: string
+                description: "Имя товара"
+              preview_image:
+                type: string
+                description: "Превью изображения"
+      example:
+        uuid: "a123e4567-e89b-12d3-a456-426614174000"
+        name: "Статья A"
+        code: "article-a"
+        text: "Текст статьи A"
+        user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+        created_at: "2023-05-03T11:30:00Z"
+        updated_at: "2023-05-03T12:00:00Z"
+        products:
+          - uuid: "123e4567-e89b-12d3-a456-426614174000"
+            name: "Продукт A"
+            preview_image: "/images/product-a.jpg"
+
+    ArticleList:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: "UUID статьи"
+              name:
+                type: string
+                description: "Имя статьи"
+              code:
+                type: string
+                description: "Код статьи"
+              text:
+                type: string
+                description: "Текст статьи"
+              user_uuid:
+                type: string
+                description: "UUID пользователя"
+              created_at:
+                type: string
+                format: date-time
+                description: "Дата создания"
+              updated_at:
+                type: string
+                format: date-time
+                description: "Дата обновления"
+              products:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                      description: "UUID товара"
+                    name:
+                      type: string
+                      description: "Имя товара"
+                    preview_image:
+                      type: string
+                      description: "Превью изображения"
+          example:
+            - uuid: "a123e4567-e89b-12d3-a456-426614174000"
+              name: "Статья A"
+              code: "article-a"
+              text: "Текст статьи A"
+              user_uuid: "u123e4567-e89b-12d3-a456-426614174000"
+              created_at: "2023-05-03T11:30:00Z"
+              updated_at: "2023-05-03T12:00:00Z"
+              products:
+                - uuid: "123e4567-e89b-12d3-a456-426614174000"
+                  name: "Продукт A"
+                  preview_image: "/images/product-a.jpg"
+                - uuid: "223e4567-e89b-12d3-a456-426614174001"
+                  name: "Продукт B"
+                  preview_image: "/images/product-b.jpg"
+
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "Успешный ответ"
+      example:
+        success: true
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: integer
+          description: "Код ошибки"
+        message:
+          type: string
+          description: "Сообщение об ошибке"
+      example:
+        error_code: 400
+        message: "Неверный запрос"
