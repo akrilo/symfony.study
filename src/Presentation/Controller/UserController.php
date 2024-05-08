@@ -6,6 +6,7 @@ namespace App\Presentation\Controller;
 
 use App\Application\DTO\RequestDTO\UserRequestDTO;
 use App\Application\DTO\ResponseDTO\ErrorDTO;
+use App\Application\DTOMapper\UserRequestMapper;
 use App\Application\UseCase\User\CreateUserUseCase;
 use App\Application\UseCase\User\DeleteUserUseCase;
 use App\Application\UseCase\User\GetUserUseCase;
@@ -40,134 +41,49 @@ class UserController extends AbstractController
     }
 
     #[Route('/users', name: 'create_user', methods: ['POST'])]
-    public function createUser(Request $request, ValidatorInterface $validator): JsonResponse
+    public function createUser(Request $request): JsonResponse
     {
-        try{
-            $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
+        $requestDTO = UserRequestMapper::toDTO($data);
 
-            $requestDTO = new UserRequestDTO();
-            $requestDTO->phone = $data['phone'] ?? null;
-            $requestDTO->password = $data['password'] ?? null;
-            $requestDTO->email = $data['email'] ?? null;
-            $requestDTO->surname = $data['surname'] ?? null;
-            $requestDTO->name = $data['name'] ?? null;
-            $requestDTO->patronymic = $data['patronymic'] ?? null;
-            $requestDTO->avatar = $data['avatar'] ?? null;
-            $requestDTO->is_moderator = $data['is_moderator'] ?? null;
+        $responseDTO = $this->createUserUseCase->execute($requestDTO);
+        $statusCode = $responseDTO->error_code ?? 201;
 
-            $errors = $validator->validate($requestDTO);
-
-            if (count($errors) > 0) {
-                throw new \Exception("Validation failed", 400);
-            }
-
-            $responseDTO = $this->createUserUseCase->execute($requestDTO);
-
-            return new JsonResponse($responseDTO, 201);
-        } catch (\Exception $e) {
-            $errorDTO = new ErrorDTO();
-            $errorDTO->error_code = $e->getCode() ?: 500;
-            $errorDTO->message = $e->getMessage() ?: "Internal Server Error";
-            return new JsonResponse($errorDTO, $errorDTO->error_code);
-        }
+        return new JsonResponse($responseDTO, $statusCode);
     }
 
     #[Route('/users/{user_uuid}', name: 'get_user', methods: ['GET'])]
-    public function getUserByUuid(string $user_uuid, ValidatorInterface $validator): JsonResponse
+    public function getUserByUuid(string $user_uuid): JsonResponse
     {
-        try{
-            $requestDTO = new UserRequestDTO();
-            $requestDTO->uuid = $user_uuid;
+        $requestDTO = UserRequestMapper::toDTO( null, $user_uuid);
 
-            $errors = $validator->validate($requestDTO);
+        $responseDTO = $this->getUserUseCase->execute($requestDTO);
+        $statusCode = $responseDTO->error_code ?? 200;
 
-            foreach ($errors as $error) {
-                if ($error->getPropertyPath() === 'uuid') {
-                    throw new \Exception("Validation failed", 400);
-                }
-            }
-
-            $responseDTO = $this->getUserUseCase->execute($requestDTO);
-
-            if ($responseDTO === null) {
-                throw new \Exception("User not found", 404);
-            }
-
-            return new JsonResponse($responseDTO, 200);
-        } catch (\Exception $e) {
-            $errorDTO = new ErrorDTO();
-            $errorDTO->error_code = $e->getCode() ?: 500;
-            $errorDTO->message = $e->getMessage() ?: "Internal Server Error";
-            return new JsonResponse($errorDTO, $errorDTO->error_code);
-        }
+        return new JsonResponse($responseDTO, $statusCode);
     }
 
     #[Route('/users/{user_uuid}', name: 'update_user', methods: ['PATCH'])]
-    public function updateUser(string $user_uuid, Request $request, ValidatorInterface $validator): JsonResponse
+    public function updateUser(string $user_uuid, Request $request): JsonResponse
     {
-        try{
-            $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
+        $requestDTO = UserRequestMapper::toDTO($data, $user_uuid);
 
-            $requestDTO = new UserRequestDTO();
-            $requestDTO->uuid = $user_uuid;
-            $requestDTO->phone = $data['phone'] ?? null;
-            $requestDTO->password = $data['password'] ?? null;
-            $requestDTO->email = $data['email'] ?? null;
-            $requestDTO->surname = $data['surname'] ?? null;
-            $requestDTO->name = $data['name'] ?? null;
-            $requestDTO->patronymic = $data['patronymic'] ?? null;
-            $requestDTO->avatar = $data['avatar'] ?? null;
-            $requestDTO->is_moderator = $data['is_moderator'] ?? null;
+        $responseDTO = $this->updateUserUseCase->execute($requestDTO);
+        $statusCode = $responseDTO->error_code ?? 200;
 
-            $errors = $validator->validate($requestDTO);
-
-            foreach ($errors as $error) {
-                if ($error->getPropertyPath() === 'uuid') {
-                    throw new \Exception("Validation failed", 400);
-                }
-            }
-
-            $responseDTO = $this->updateUserUseCase->execute($requestDTO);
-
-            if ($responseDTO === null) {
-                throw new \Exception("User not found", 404);
-            }
-            return new JsonResponse($responseDTO, 200);
-        } catch (\Exception $e){
-            $errorDTO = new ErrorDTO();
-            $errorDTO->error_code = $e->getCode() ?: 500;
-            $errorDTO->message = $e->getMessage() ?: "Internal Server Error";
-            return new JsonResponse($errorDTO, $errorDTO->error_code);
-        }
+        return new JsonResponse($responseDTO, $statusCode);
     }
 
     #[Route('/users/{user_uuid}', name: 'delete_user', methods: ['DELETE'])]
-    public function deleteUser(string $user_uuid, ValidatorInterface $validator): JsonResponse
+    public function deleteUser(string $user_uuid): JsonResponse
     {
-        try{
-            $requestDTO = new UserRequestDTO();
-            $requestDTO->uuid = $user_uuid;
+        $requestDTO = new UserRequestDTO();
+        $requestDTO->uuid = $user_uuid;
 
-            $errors = $validator->validate($requestDTO);
+        $responseDTO = $this->deleteUserUseCase->execute($requestDTO);
+        $statusCode = $responseDTO->error_code ?? 200;
 
-            foreach ($errors as $error) {
-                if ($error->getPropertyPath() === 'uuid') {
-                    throw new \Exception("Validation failed", 400);
-                }
-            }
-
-            $responseDTO = $this->deleteUserUseCase->execute($requestDTO);
-
-            if ($responseDTO === null) {
-                throw new \Exception("User not found", 404);
-            }
-
-            return new JsonResponse($responseDTO, 204);
-        } catch (\Exception $e){
-            $errorDTO = new ErrorDTO();
-            $errorDTO->error_code = $e->getCode() ?: 500;
-            $errorDTO->message = $e->getMessage() ?: "Internal Server Error";
-            return new JsonResponse($errorDTO, $errorDTO->error_code);
-        }
+        return new JsonResponse($responseDTO, $statusCode);
     }
 }
