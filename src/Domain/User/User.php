@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\User;
 
 use App\Infrastructure\Repository\UserRepository;
@@ -38,13 +40,13 @@ class User
     private ?string $avatar = null;
 
     #[ORM\Column]
-    private ?bool $is_moderator = null;
+    private ?bool $isModerator = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getUuid(): ?Uuid
     {
@@ -137,36 +139,36 @@ class User
 
     public function getIsModerator(): ?bool
     {
-        return $this->is_moderator;
+        return $this->isModerator;
     }
 
-    public function setIsModerator(bool $is_moderator): static
+    public function setIsModerator(bool $isModerator): static
     {
-        $this->is_moderator = $is_moderator;
+        $this->isModerator = $isModerator;
 
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

@@ -1,43 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\User;
 
-use App\Application\DTO\RequestDTO\UserRequestDTO;
-use App\Application\DTO\ResponseDTO\ErrorDTO;
-use App\Application\DTO\ResponseDTO\UserResponseDTO;
-use App\Application\DTOMapper\ErrorMapper;
-use App\Domain\Service\UserService;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Application\DTO\ErrorDTO;
+use App\Application\Exception\NotFoundException;
+use App\Application\Exception\ValidationException;
+use App\Domain\DTO\RequestDTO\UserRequestDTO;
+use App\Domain\DTO\ResponseDTO\UserResponseDTO;
+use App\Domain\User\UserRepositoryInterface;
+use Symfony\Component\Uid\Uuid;
 
 class UpdateUserUseCase
 {
-    private UserService $userService;
-    private ValidatorInterface $validator;
+    public function __construct(
+        private UserRepositoryInterface $userRepository,
+    ) { }
 
-    public function __construct(UserService $userService, ValidatorInterface $validator)
-    {
-        $this->userService = $userService;
-        $this->validator = $validator;
-    }
-
-    public function execute(UserRequestDTO $requestDTO): UserResponseDTO|ErrorDTO
+    public function execute(string $uuid, UserRequestDTO $requestDTO): UserResponseDTO|ErrorDTO
     {
         try{
-            $errors = $this->validator->validate($requestDTO);
-
-            foreach ($errors as $error) {
-                if ($error->getPropertyPath() === 'uuid') {
-                    throw new \Exception("Validation failed", 400);
-                }
+            if (!Uuid::isValid($uuid)) {
+                throw new ValidationException;
             }
 
-            $responseDTO = $this->userService->updateUser($requestDTO);
+            $responseDTO = $this->userRepository->updateById($uuid, $requestDTO);
             if ($responseDTO === null) {
-                throw new \Exception("User not found", 404);
+                throw new NotFoundException;
             }
             return $responseDTO;
-        } catch (\Exception $e) {
-            return ErrorMapper::toDTO($e);
+        } catch (ValidationException | NotFoundException $e) {
+            return ErrorDTO::toDTO($e);
         }
     }
 }

@@ -2,17 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Controller;
+namespace App\Tests\Presentation\Controller;
 
-use App\Application\DTO\ResponseDTO\SuccessDTO;
-use App\Presentation\Controller\UserController;
+use App\Application\DTO\SuccessDTO;
 use App\Application\UseCase\User\CreateUserUseCase;
+use App\Application\UseCase\User\DeleteUserUseCase;
 use App\Application\UseCase\User\GetUserUseCase;
 use App\Application\UseCase\User\UpdateUserUseCase;
-use App\Application\UseCase\User\DeleteUserUseCase;
-use App\Application\DTO\RequestDTO\UserRequestDTO;
-use App\Application\DTO\ResponseDTO\UserResponseDTO;
-use App\Application\DTO\ResponseDTO\ErrorDTO;
+use App\Domain\DTO\ResponseDTO\UserResponseDTO;
+use App\Presentation\Controller\UserController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +38,7 @@ class UserControllerTest extends TestCase
         $expectedResponse->email = 'user@example.com';
         $expectedResponse->surname = 'Иванов';
         $expectedResponse->name = 'Иван';
-        $expectedResponse->is_moderator = false;
+        $expectedResponse->isModerator = false;
 
         $this->createUserUseCase->expects($this->once())
             ->method('execute')

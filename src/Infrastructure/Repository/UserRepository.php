@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Infrastructure\Repository;
 
-use App\Application\DTO\RequestDTO\UserRequestDTO;
-use App\Application\DTO\ResponseDTO\SuccessDTO;
-use App\Application\DTO\ResponseDTO\UserResponseDTO;
-use App\Application\DTOMapper\SuccessMapper;
-use App\Application\DTOMapper\UserResponseMapper;
+use App\Domain\DTO\RequestDTO\UserRequestDTO;
+use App\Domain\DTO\ResponseDTO\UserResponseDTO;
 use App\Domain\User\User;
 use App\Domain\User\UserRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -24,10 +23,9 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $this->entityManager = $entityManager;
     }
 
-    public function createUser(UserRequestDTO $requestDTO): ?UserResponseDTO
+    public function persist(UserRequestDTO $requestDTO): ?UserResponseDTO
     {
-        $user = new User();
-        $user = UserResponseMapper::toEntity($requestDTO, $user);
+        $user = UserRequestDTO::toEntity(new User(), $requestDTO);
 
         $now = new \DateTimeImmutable();
         $user->setCreatedAt($now);
@@ -36,40 +34,40 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return UserResponseMapper::toDTO($user);
+        return UserResponseDTO::toDTO($user);
     }
 
-    public function getUser(UserRequestDTO $requestDTO): ?UserResponseDTO
+    public function findById(string $uuid): ?UserResponseDTO
     {
-        $user = $this->findOneBy(['uuid' => $requestDTO->uuid]);
+        $user = $this->findOneBy(['uuid' => $uuid]);
 
         if (!$user) {
             return null;
         }
 
-        return UserResponseMapper::toDTO($user);
+        return UserResponseDTO::toDTO($user);
     }
 
-    public function updateUser(UserRequestDTO $requestDTO): ?UserResponseDTO
+    public function updateById(string $uuid, UserRequestDTO $requestDTO): ?UserResponseDTO
     {
-        $user = $this->findOneBy(['uuid' => $requestDTO->uuid]);
+        $user = $this->findOneBy(['uuid' => $uuid]);
 
         if (!$user) {
             return null;
         }
 
-        $user = UserResponseMapper::toEntity($requestDTO, $user);
+        $user = UserRequestDTO::toEntity($user, $requestDTO);
 
         $user->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->flush();
 
-        return UserResponseMapper::toDTO($user);
+        return UserResponseDTO::toDTO($user);
     }
 
-    public function deleteUser(UserRequestDTO $requestDTO): ?SuccessDTO
+    public function removeById(string $uuid): ?bool
     {
-        $user = $this->findOneBy(['uuid' => $requestDTO->uuid]);
+        $user = $this->findOneBy(['uuid' => $uuid]);
 
         if (!$user) {
             return null;
@@ -78,6 +76,6 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $this->entityManager->remove($user);
         $this->entityManager->flush();
 
-        return SuccessMapper::toDTO();
+        return true;
     }
 }
