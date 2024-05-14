@@ -21,11 +21,11 @@ paths:
           example: 1
           description: "Номер страницы"
         - in: query
-          name: "page_size"
+          name: "limit"
           schema:
             type: integer
-          example: 10
-          description: "Размер страницы"
+          example: 4
+          description: "Лимит"
         - in: query
           name: "sort_by"
           schema:
@@ -255,6 +255,7 @@ paths:
               name: "Иван"
               patronymic: "Иванович"
               avatar: "/avatars/ivanov.jpg"
+              is_moderator: false
             schema:
               $ref: '#/components/schemas/UserRequest'
       responses:
@@ -270,6 +271,7 @@ paths:
                 name: "Иван"
                 patronymic: "Иванович"
                 avatar: "/avatars/ivanov.jpg"
+                is_moderator: true
                 created_at: "2023-05-03T12:00:00Z"
                 updated_at: "2023-05-03T12:00:00Z"
               schema:
@@ -310,6 +312,7 @@ paths:
                 name: "Иван"
                 patronymic: "Иванович"
                 avatar: "/avatars/ivanov.jpg"
+                is_moderator: true
                 created_at: "2023-05-03T12:00:00Z"
                 updated_at: "2023-05-03T12:00:00Z"
               schema:
@@ -342,11 +345,13 @@ paths:
           application/json:
             example:
               phone: "+79998887766"
+              password: "password123"
               email: "user_new@example.com"
               surname: "Иванов"
               name: "Иван"
               patronymic: "Иванович"
               avatar: "/avatars/ivanov_new.jpg"
+              is_moderator: true
             schema:
               $ref: '#/components/schemas/UserRequest'
       responses:
@@ -362,6 +367,7 @@ paths:
                 name: "Иван"
                 patronymic: "Иванович"
                 avatar: "/avatars/ivanov_new.jpg"
+                is_moderator: false
                 created_at: "2023-05-03T12:00:00Z"
                 updated_at: "2023-05-03T14:00:00Z"
               schema:
@@ -1003,6 +1009,9 @@ components:
         avatar:
           type: string
           description: "URL аватара"
+        is_moderator:
+          type: boolean
+          description: "Модератор"
       example:
         phone: "+79998887766"
         password: "password123"
@@ -1011,6 +1020,7 @@ components:
         name: "Иван"
         patronymic: "Иванович"
         avatar: "/avatars/ivanov.jpg"
+        is_moderator: false
 
     User:
       type: object
@@ -1036,6 +1046,9 @@ components:
         avatar:
           type: string
           description: "URL аватара"
+        is_moderator:
+          type: boolean
+          description: "Модератор"
         created_at:
           type: string
           format: date-time
@@ -1052,6 +1065,7 @@ components:
         name: "Иван"
         patronymic: "Иванович"
         avatar: "/avatars/ivanov.jpg"
+        is_moderator: false
         created_at: "2023-05-03T12:00:00Z"
         updated_at: "2023-05-03T12:00:00Z"
 
@@ -1111,16 +1125,16 @@ components:
       properties:
         name:
           type: string
-          description: "Имя статьи"
+          description: "Имя"
         code:
           type: string
-          description: "Код статьи"
+          description: "Код"
         text:
           type: string
-          description: "Текст статьи"
+          description: "Текст"
         user_uuid:
           type: string
-          description: "UUID пользователя"
+          description: "UUID"
         product_uuids:
           type: array
           items:
@@ -1198,16 +1212,16 @@ components:
             properties:
               uuid:
                 type: string
-                description: "UUID статьи"
+                description: "UUID"
               name:
                 type: string
-                description: "Имя статьи"
+                description: "Имя"
               code:
                 type: string
-                description: "Код статьи"
+                description: "Код"
               text:
                 type: string
-                description: "Текст статьи"
+                description: "Текст"
               user_uuid:
                 type: string
                 description: "UUID пользователя"
