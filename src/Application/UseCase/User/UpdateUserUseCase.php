@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Application\UseCase\User;
 
 use App\Application\DTO\ErrorDTO;
-use App\Application\Exception\NotFoundException;
-use App\Application\Exception\ValidationException;
 use App\Domain\DTO\RequestDTO\UserRequestDTO;
 use App\Domain\DTO\ResponseDTO\UserResponseDTO;
+use App\Domain\Exception\NotFoundException;
+use App\Domain\Exception\ValidationException;
 use App\Domain\User\UserRepositoryInterface;
 use Symfony\Component\Uid\Uuid;
 

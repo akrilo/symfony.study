@@ -6,8 +6,8 @@ namespace App\Application\UseCase\User;
 
 use App\Application\DTO\ErrorDTO;
 use App\Application\DTO\SuccessDTO;
-use App\Application\Exception\NotFoundException;
-use App\Application\Exception\ValidationException;
+use App\Domain\Exception\NotFoundException;
+use App\Domain\Exception\ValidationException;
 use App\Domain\User\UserRepositoryInterface;
 use Symfony\Component\Uid\Uuid;
 
