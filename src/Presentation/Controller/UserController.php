@@ -22,7 +22,6 @@ class UserController extends AbstractController
         private GetUserUseCase $getUserUseCase,
         private UpdateUserUseCase $updateUserUseCase,
         private DeleteUserUseCase $deleteUserUseCase,
-
     ) { }
 
     #[Route('/users', name: 'create_user', methods: ['POST'])]

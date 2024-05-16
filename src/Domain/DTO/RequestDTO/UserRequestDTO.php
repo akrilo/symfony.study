@@ -46,7 +46,7 @@ class UserRequestDTO
         return $dto;
     }
 
-    public static function toEntity(User $user, UserRequestDTO $dto): ?User
+    public static function toEntity(User $user, UserRequestDTO $dto): User
     {
         if (isset($dto->phone)) {
             $user->setPhone($dto->phone);

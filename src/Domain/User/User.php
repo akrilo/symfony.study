@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domain\User;
 
+use App\Domain\Article\Article;
+use App\Domain\Product\Product;
 use App\Infrastructure\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
@@ -47,6 +51,68 @@ class User
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'users', cascade: ['persist', 'remove'])]
+    #[ORM\JoinTable(name: 'user_favorite')]
+    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
+    #[ORM\InverseJoinColumn(name: 'product_uuid', referencedColumnName: 'uuid')]
+    private Collection $favoriteProducts;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Article::class, cascade: ['persist', 'remove'])]
+    private Collection $articles;
+
+    public function __construct()
+    {
+        $this->favoriteProducts = new ArrayCollection();
+        $this->articles = new ArrayCollection();
+    }
+
+    public function getFavoriteProducts(): Collection
+    {
+        return $this->favoriteProducts;
+    }
+
+    public function addFavoriteProduct(Product $product): self
+    {
+        if (!$this->favoriteProducts->contains($product)) {
+            $this->favoriteProducts->add($product);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteProduct(Product $product): self
+    {
+        $this->favoriteProducts->removeElement($product);
+
+        return $this;
+    }
+
+    public function getArticles(): Collection
+    {
+        return $this->articles;
+    }
+
+    public function addArticle(Article $article): self
+    {
+        if (!$this->articles->contains($article)) {
+            $this->articles->add($article);
+            $article->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticle(Article $article): self
+    {
+        if ($this->articles->removeElement($article)) {
+            if ($article->getUser() === $this) {
+                $article->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 
     public function getUuid(): ?Uuid
     {

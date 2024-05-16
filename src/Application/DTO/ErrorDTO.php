@@ -19,4 +19,12 @@ class ErrorDTO
 
         return $dto;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'error_code' => $this->errorCode,
+            'message' => $this->message,
+        ];
+    }
 }
