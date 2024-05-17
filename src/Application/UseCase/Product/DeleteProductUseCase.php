@@ -24,7 +24,7 @@ class DeleteProductUseCase
                 throw new ValidationException;
             }
 
-            $response = $this->productRepository->removeById($uuid);
+            $response = $this->productRepository->removeByUuid($uuid);
 
             if ($response === null) {
                 throw new NotFoundException;

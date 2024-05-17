@@ -10,10 +10,10 @@ use App\Domain\DTO\ResponseDTO\UserResponseDTO;
 
 interface UserRepositoryInterface
 {
-    public function findById(string $uuid): ?UserResponseDTO;
+    public function findByUuid(string $uuid): ?UserResponseDTO;
     public function persist(UserRequestDTO $requestDTO): ?UserResponseDTO;
-    public function updateById(string $uuid, UserRequestDTO $requestDTO): ?UserResponseDTO;
-    public function removeById(string $uuid): ?bool;
+    public function updateByUuid(string $uuid, UserRequestDTO $requestDTO): ?UserResponseDTO;
+    public function removeByUuid(string $uuid): ?bool;
 
     public function persistFavorite(string $userUuid, string $productUuid): ?bool;
     public function removeFavorite(string $userUuid, string $productUuid): ?bool;

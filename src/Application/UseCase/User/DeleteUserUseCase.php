@@ -24,7 +24,7 @@ class DeleteUserUseCase
                 throw new ValidationException;
             }
 
-            $response = $this->userRepository->removeById($uuid);
+            $response = $this->userRepository->removeByUuid($uuid);
 
             if ($response === null) {
                 throw new NotFoundException;

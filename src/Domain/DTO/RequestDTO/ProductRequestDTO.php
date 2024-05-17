@@ -42,7 +42,7 @@ class ProductRequestDTO
         $product->setCode($dto->code);
         $product->setDescription($dto->description);
         $product->setPreviewImage($dto->previewImage);
-        $product->setPrice((float)$dto->price);
+        $product->setPrice($dto->price);
         if ($category) {
             $product->setCategory($category);
         }

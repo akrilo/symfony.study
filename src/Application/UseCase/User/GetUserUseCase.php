@@ -24,7 +24,7 @@ class GetUserUseCase
                 throw new ValidationException;
             }
 
-            $responseDTO = $this->userRepository->findById($uuid);
+            $responseDTO = $this->userRepository->findByUuid($uuid);
 
             if ($responseDTO === null) {
                 throw new NotFoundException;

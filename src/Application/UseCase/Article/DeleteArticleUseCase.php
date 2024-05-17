@@ -2,35 +2,35 @@
 
 declare(strict_types=1);
 
-namespace App\Application\UseCase\Product;
+namespace App\Application\UseCase\Article;
 
 use App\Application\DTO\ErrorDTO;
-use App\Domain\DTO\ResponseDTO\ProductResponseDTO;
+use App\Application\DTO\SuccessDTO;
+use App\Domain\Article\ArticleRepositoryInterface;
 use App\Domain\Exception\NotFoundException;
 use App\Domain\Exception\ValidationException;
-use App\Domain\Product\ProductRepositoryInterface;
 use Symfony\Component\Uid\Uuid;
 
-class GetProductUseCase
+class DeleteArticleUseCase
 {
     public function __construct(
-        private ProductRepositoryInterface $productRepository
+        private ArticleRepositoryInterface $articleRepository
     ) { }
 
-    public function execute(string $uuid): ProductResponseDTO|ErrorDTO
+    public function execute(string $uuid): SuccessDTO|ErrorDTO
     {
         try{
             if (!Uuid::isValid($uuid)) {
                 throw new ValidationException;
             }
 
-            $responseDTO = $this->productRepository->findByUuid($uuid);
+            $response = $this->articleRepository->removeByUuid($uuid);
 
-            if ($responseDTO === null) {
+            if ($response === null) {
                 throw new NotFoundException;
             }
 
-            return $responseDTO;
+            return SuccessDTO::toDTO($response);
         } catch (ValidationException | NotFoundException $e) {
             return ErrorDTO::toDTO($e);
         }

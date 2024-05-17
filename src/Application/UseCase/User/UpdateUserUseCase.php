@@ -25,7 +25,7 @@ class UpdateUserUseCase
                 throw new ValidationException;
             }
 
-            $responseDTO = $this->userRepository->updateById($uuid, $requestDTO);
+            $responseDTO = $this->userRepository->updateByUuid($uuid, $requestDTO);
             if ($responseDTO === null) {
                 throw new NotFoundException;
             }

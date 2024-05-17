@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\UseCase\Favorite;
 
 use App\Application\DTO\ErrorDTO;
-use App\Application\DTO\SuccessDTO;
 use App\Domain\DTO\ResponseDTO\FavoriteResponseDTO;
 use App\Domain\Exception\NotFoundException;
 use App\Domain\Exception\ValidationException;
@@ -19,7 +20,7 @@ class GetFavoriteUseCase
     public function execute(string $userUuid): FavoriteResponseDTO|ErrorDTO
     {
         try{
-            if (!Uuid::isValid($userUuid) && !Uuid::isValid($productUuid)) {
+            if (!Uuid::isValid($userUuid)) {
                 throw new ValidationException;
             }
 

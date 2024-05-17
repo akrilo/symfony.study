@@ -28,7 +28,7 @@ class ProductRepository extends ServiceEntityRepository implements ProductReposi
         $this->entityManager = $entityManager;
     }
 
-    public function findById(string $uuid): ?ProductResponseDTO
+    public function findByUuid(string $uuid): ?ProductResponseDTO
     {
         $product = $this->findOneBy(['uuid' => $uuid]);
 
@@ -82,7 +82,7 @@ class ProductRepository extends ServiceEntityRepository implements ProductReposi
         return $responseDTO;
     }
 
-    public function removeById(string $uuid): ?bool
+    public function removeByUuid(string $uuid): ?bool
     {
         $product = $this->findOneBy(['uuid' => $uuid]);
 

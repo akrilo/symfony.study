@@ -2,35 +2,35 @@
 
 declare(strict_types=1);
 
-namespace App\Application\UseCase\Favorite;
+namespace App\Application\UseCase\Article;
 
 use App\Application\DTO\ErrorDTO;
-use App\Application\DTO\SuccessDTO;
+use App\Domain\Article\ArticleRepositoryInterface;
+use App\Domain\DTO\ResponseDTO\ArticleResponseDTO;
 use App\Domain\Exception\NotFoundException;
 use App\Domain\Exception\ValidationException;
-use App\Domain\User\UserRepositoryInterface;
 use Symfony\Component\Uid\Uuid;
 
-class DeleteFavoriteUseCase
+class GetArticleUseCase
 {
     public function __construct(
-        private UserRepositoryInterface $userRepository
+        private ArticleRepositoryInterface $articleRepository
     ) { }
 
-    public function execute(string $userUuid, string $productUuid): SuccessDTO|ErrorDTO
+    public function execute(string $userUuid): ArticleResponseDTO|ErrorDTO
     {
         try{
-            if (!Uuid::isValid($userUuid) && !Uuid::isValid($productUuid)) {
+            if (!Uuid::isValid($userUuid)) {
                 throw new ValidationException;
             }
 
-            $response = $this->userRepository->removeFavorite($userUuid, $productUuid);
+            $response = $this->articleRepository->findByUuid($userUuid);
 
             if ($response === null) {
                 throw new NotFoundException;
             }
 
-            return SuccessDTO::toDTO($response);
+            return $response;
         } catch (ValidationException|NotFoundException $e) {
             return ErrorDTO::toDTO($e);
         }

@@ -11,11 +11,8 @@ use App\Domain\DTO\ResponseDTO\ProductResponseDTO;
 
 interface ProductRepositoryInterface
 {
-    public function findById(string $uuid): ?ProductResponseDTO;
-
+    public function findByUuid(string $uuid): ?ProductResponseDTO;
     public function persist(ProductRequestDTO $requestDTO): ?ProductResponseDTO;
-
     public function getList(ProductListRequestDTO $requestDTO): ?ProductListResponseDTO;
-
-    public function removeById(string $uuid): ?bool;
+    public function removeByUuid(string $uuid): ?bool;
 }

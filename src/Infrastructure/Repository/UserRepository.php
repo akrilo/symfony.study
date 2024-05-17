@@ -39,7 +39,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return UserResponseDTO::toDTO($user);
     }
 
-    public function findById(string $uuid): ?UserResponseDTO
+    public function findByUuid(string $uuid): ?UserResponseDTO
     {
         $user = $this->findOneBy(['uuid' => $uuid]);
 
@@ -50,7 +50,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return UserResponseDTO::toDTO($user);
     }
 
-    public function updateById(string $uuid, UserRequestDTO $requestDTO): ?UserResponseDTO
+    public function updateByUuid(string $uuid, UserRequestDTO $requestDTO): ?UserResponseDTO
     {
         $user = $this->findOneBy(['uuid' => $uuid]);
 
@@ -67,7 +67,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return UserResponseDTO::toDTO($user);
     }
 
-    public function removeById(string $uuid): ?bool
+    public function removeByUuid(string $uuid): ?bool
     {
         $user = $this->findOneBy(['uuid' => $uuid]);
 
